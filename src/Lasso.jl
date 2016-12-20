@@ -187,6 +187,7 @@ function Base.show(io::IO, path::LassoPath)
         ncoefs[i] = coefs.colptr[i+1] - coefs.colptr[i]
     end
     ncoefs[end] = nnz(coefs) - coefs.colptr[size(coefs, 2)] + 1
+    Base.showarray(io, [1,2,3,4])
     Base.showarray(io, [path.λ path.pct_dev ncoefs]; header=false)
 end
 
