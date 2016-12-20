@@ -11,7 +11,7 @@ Lasso paths
     The optional argument `d` specifies the conditional distribution of
     response, while `l` specifies the link function. Lasso.jl inherits
     supported distributions and link functions from GLM.jl. The default
-    is to fit an linear Lasso path, i.e., `d=Normal(), l=IdentityLink()`, 
+    is to fit an linear Lasso path, i.e., `d=Normal(), l=IdentityLink()`,
     or :math:`\mathcal{L}(y|X,\beta) = -\frac{1}{2}\|y - X\beta\|_2^2 + C`
 
     **Keyword arguments:**
@@ -38,7 +38,7 @@ Lasso paths
                       logarithmically spaced λ values from                            ``λminratio = 1e-4``.
                       :math:`\lambda_{\text{max}}`, the smallest λ value yielding a   Otherwise,
                       null model, to                                                  ``λminratio = 0.001``.
-                      :math:`\lambda\text{minratio} * \lambda_{\text{max}}`. If the 
+                      :math:`\lambda\text{minratio} * \lambda_{\text{max}}`. If the
                       proportion of  deviance explained exceeds 0.999 or the
                       difference between the deviance explained by successive λ
                       values falls below :math:`10^{-5}`, the path stops early.
@@ -48,12 +48,13 @@ Lasso paths
     ----------------- --------------------------------------------------------------- --------------------
     intercept         Whether to fit an (unpenalized) model intercept.                ``true``
     ----------------- --------------------------------------------------------------- --------------------
-    naivealgorithm    Whether to use the naive coordinate descent algorithm, which    ``true`` if more
-                      iteratively computes the dot product of the predictors with the than 5x as many
-                      residuals, as opposed to the covariance algorithm, which uses a predictors as
-                      precomputed Gram matrix. The naive algorithm is typically       observations or
-                      faster when there are many predictors that will not enter the   model is a GLM.
-                      model or when fitting generalized linear models.                ``false`` otherwise.
+    algorithm         Algorithm to use. The NaiveCoordinateDescent algorithm, which   NaiveCoordinateDescent
+                      iteratively computes the dot product of the predictors with the if more than 5x as
+                      residuals, as opposed to the CovarianceCoordinateDescent        many predictors as
+                      algorithm, which uses a precomputed Gram matrix.                observations or
+                      NaiveCoordinateDescent is typically faster when there are many  model is a GLM.
+                      predictors that will not enter the model or when fitting        CovarianceCoordinateDescent
+                      generalized linear models.                                      otherwise.
     ----------------- --------------------------------------------------------------- --------------------
     randomize         Whether to randomize the order in which coefficients are        ``true`` (if julia >= 0.4)
                       updated by coordinate descent. This can drastically speed
@@ -86,6 +87,12 @@ Lasso paths
                         tolerance. This is the criterion used by GLM.jl.
     ----------------- --------------------------------------------------------------- --------------------
     minStepFac        The minimum step fraction for backtracking line search.         ``0.001``
+    ----------------- --------------------------------------------------------------- --------------------
+    penalty_factor    Separate penalty factor :math:`\omega_j` for each coefficient   ``ones(size(X, 2))``
+                      :math:`j`, i.e. instead of :math:`\lambda` penalties become
+                      :math:`\lambda\omega_j`.
+                      Note the penalty factors are internally rescaled to sum to
+                      the number of variables (following glmnet convention).
     ================= =============================================================== ====================
 
     ``fit`` returns a LassoPath object describing the fit coefficients
